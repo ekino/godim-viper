@@ -1,3 +1,7 @@
+// Copyright 2018 ekino.  All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file.
+
 package godimviper
 
 import (
@@ -32,6 +36,7 @@ AMapOfSliceString:
  - rhum
 dur: 4200
 time: 123456789
+i8: 5
 `)
 
 type all struct {
@@ -47,6 +52,7 @@ type all struct {
 	f   float64
 	d   time.Duration
 	t   time.Time
+	i8  int8
 }
 
 func TestConfigFunc(t *testing.T) {
@@ -153,4 +159,20 @@ func TestConfigFunc(t *testing.T) {
 		t.Fatalf("Wrong result, waiting for 123456789, got %s", tt)
 	}
 
+}
+
+func TestNotSupported(t *testing.T) {
+	v := viper.New()
+	v.SetConfigType("yaml")
+	err := v.ReadConfig(bytes.NewBuffer(yamlTest))
+	if err != nil {
+		t.Fatalf("unable to read config array %+v", err)
+	}
+	a := &all{}
+	val := reflect.ValueOf(a).Elem()
+
+	_, err = ViperForGodim("i8", val.FieldByName("i8"))
+	if err == nil {
+		t.Fatalf("Must not be supported without test change")
+	}
 }
